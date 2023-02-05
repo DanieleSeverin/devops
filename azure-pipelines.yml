@@ -7,7 +7,7 @@ trigger:
 - master
 
 pool:
-  name: LAPTOP-IOLESQN8
+  name: Default
 
 variables:
   solution: '**/*.sln'
