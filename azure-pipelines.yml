@@ -10,40 +10,26 @@ pool:
   name: Default
 
 variables:
-  solution: 'C:\repository\devops\devops.sln'
+  solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  outputFolder: 'C:\repository\devops\build\$(BuildConfiguration)\$(BuildPlatform)'
-  # iisWebsiteName: 'MyDotNetApp'
-  # iisAppPoolName: 'MyDotNetAppAppPool'
+  outputDIrectory: 'C:\repository\devops'
 
 steps:
-- task: UseDotNet@2
-  displayName: Use .Net Core 6
-  inputs:
-    packageType: 'sdk'
-    version: '6.x'
-    includePreviewVersions: true
-
 - task: NuGetToolInstaller@1
 
 - task: NuGetCommand@2
-  displayName: Restore
   inputs:
-    command: 'restore'
     restoreSolution: '$(solution)'
 
-- task: DotNetCoreCLI@2
-  displayName: Build
+- task: VSBuild@1
   inputs:
-    command: 'build'
-    projects: '$(solution)'
-    arguments: '--configuration $(buildConfiguration)'
+    solution: '$(solution)'
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(outputDIrectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
 
-- task: DotNetCoreCLI@2
-  displayName: Publish
+- task: VSTest@2
   inputs:
-    command: 'publish'
-    publishWebProjects: true
-    projects: '$(solution)'
-    arguments: '--configuration $(buildConfiguration) --output $(outputFolder)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
